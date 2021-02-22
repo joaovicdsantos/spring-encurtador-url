@@ -13,9 +13,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,9 +33,8 @@ public class LinkController {
     @RequestMapping
     @ResponseStatus(code = HttpStatus.OK)
     public ResponseEntity<List<Link>> consultarLinks() {
-        if (repository.findAll().isEmpty()) {
+        if (repository.findAll().isEmpty())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
         return ResponseEntity.ok(repository.findAll());
     }
 
@@ -52,14 +55,34 @@ public class LinkController {
 
         // Senão devemos criar
         String linkEncurtado;
-        do {
-            linkEncurtado = LinkUtils.gerarHash();
-        } while (repository.existsByLinkEncurtado(linkEncurtado));
+        do linkEncurtado = LinkUtils.gerarHash();
+        while (repository.existsByLinkEncurtado(linkEncurtado));
         return ResponseEntity.ok(repository.save(new Link(link, linkEncurtado)));
 
     }
 
-    // @GetMapping
-    // @ResponseStatus(code = HttpStatus)
+    @GetMapping("/{id}")
+    @ResponseStatus(code = HttpStatus.OK)
+    public ResponseEntity<Link> consultarLink(@PathVariable("id") Long id) {
+        if (!repository.existsById(id))
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        return ResponseEntity.ok(repository.findById(id).get());
+    }
+
+    @GetMapping("/atributo")
+    @ResponseStatus(code = HttpStatus.OK)
+    public ResponseEntity<Link> consultarLinkPelosLinks(@RequestParam("link") String link) {
+        if (!repository.existsByLink(link) && !repository.existsByLinkEncurtado(link))
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        if (repository.existsByLink(link))
+            return ResponseEntity.ok(repository.findByLink(link));
+        return ResponseEntity.ok(repository.findByLinkEncurtado(link));
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(code = HttpStatus.NO_CONTENT)
+    public void deletarLink(@PathVariable("id") Long id) {
+        repository.deleteById(id);
+    }
 
 }
