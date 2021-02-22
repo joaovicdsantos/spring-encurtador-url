@@ -24,12 +24,16 @@ public class Link {
     @Column(nullable = false, unique = true)
     private String linkEncurtado;
 
-    @Column(nullable = false, columnDefinition = "numeric default 0")
+    @Column(columnDefinition = "numeric default 0")
     private Integer acessos;
+
+    public Link() {
+    }
 
     public Link(String link, String linkEncurtado) {
         this.link = link;
         this.linkEncurtado = linkEncurtado;
+        this.acessos = 0;
     }
 
     public Long getId() {
