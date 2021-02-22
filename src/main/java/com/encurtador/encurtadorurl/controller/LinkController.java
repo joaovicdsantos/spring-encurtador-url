@@ -1,10 +1,15 @@
 package com.encurtador.encurtadorurl.controller;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.encurtador.encurtadorurl.model.Link;
 import com.encurtador.encurtadorurl.repositories.LinkRespository;
-import com.encurtador.encurtadorurl.utils.LinkUtils;
+import com.encurtador.encurtadorurl.util.LinkUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collections;
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1/links")
 public class LinkController {
@@ -24,19 +26,26 @@ public class LinkController {
     @Autowired
     private LinkRespository repository;
 
-    @RequestMapping("")
+    @RequestMapping
     @ResponseStatus(code = HttpStatus.OK)
-    public ResponseEntity consultarLinks() {
+    public ResponseEntity<List<Link>> consultarLinks() {
         if (repository.findAll().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.singletonMap("resposta", "Não há links cadastrados!"));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         return ResponseEntity.ok(repository.findAll());
     }
 
-    @PostMapping("/link")
+    @PostMapping
     @ResponseStatus(code = HttpStatus.ACCEPTED)
     public ResponseEntity<Link> criarLink(@RequestBody String link) {
 
+        Map<String, String> requestBody;
+        try {
+            requestBody = new ObjectMapper().readValue(link, HashMap.class);
+        } catch (JsonProcessingException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+        link = requestBody.get("link");
         // Se o link já existir
         if (repository.existsByLink(link))
             return ResponseEntity.ok(repository.findByLink(link));
@@ -49,5 +58,8 @@ public class LinkController {
         return ResponseEntity.ok(repository.save(new Link(link, linkEncurtado)));
 
     }
+
+    // @GetMapping
+    // @ResponseStatus(code = HttpStatus)
 
 }
