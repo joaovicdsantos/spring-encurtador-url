@@ -3,6 +3,7 @@ package com.encurtador.encurtadorurl.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import com.encurtador.encurtadorurl.model.Link;
 import com.encurtador.encurtadorurl.repositories.LinkRepository;
@@ -50,8 +51,9 @@ public class LinkController {
         }
         link = requestBody.get("link");
         // Se o link já existir
-        if (repository.existsByLink(link))
-            return ResponseEntity.ok(repository.findByLink(link));
+        Optional<Link> linkRetorno = repository.findByLink(link);
+        if (linkRetorno.isPresent())
+            return ResponseEntity.ok(linkRetorno.get());
 
         // Senão devemos criar
         String linkEncurtado;
@@ -64,19 +66,22 @@ public class LinkController {
     @GetMapping("/{id}")
     @ResponseStatus(code = HttpStatus.OK)
     public ResponseEntity<Link> consultarLink(@PathVariable("id") Long id) {
-        if (!repository.existsById(id))
+        Optional<Link> linkRetorno = repository.findById(id);
+        if (linkRetorno.isEmpty())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        return ResponseEntity.ok(repository.findById(id).get());
+        return ResponseEntity.ok(linkRetorno.get());
     }
 
     @GetMapping("/filtro")
     @ResponseStatus(code = HttpStatus.OK)
     public ResponseEntity<Link> consultarLinkPelosLinks(@RequestParam("link") String link) {
-        if (!repository.existsByLink(link) && !repository.existsByLinkEncurtado(link))
+        Optional<Link> linkRetorno = repository.findByLink(link);
+        Optional<Link> linkEncurtadoRetorno = repository.findByLinkEncurtado(link);
+        if (linkRetorno.isEmpty() && linkEncurtadoRetorno.isEmpty())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        if (repository.existsByLink(link))
-            return ResponseEntity.ok(repository.findByLink(link));
-        return ResponseEntity.ok(repository.findByLinkEncurtado(link));
+        if (linkRetorno.isPresent())
+            return ResponseEntity.ok(linkRetorno.get());
+        return ResponseEntity.ok(linkEncurtadoRetorno.get());
     }
 
     @DeleteMapping("/{id}")
