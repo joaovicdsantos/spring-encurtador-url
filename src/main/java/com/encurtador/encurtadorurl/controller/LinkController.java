@@ -9,6 +9,7 @@ import com.encurtador.encurtadorurl.model.Link;
 import com.encurtador.encurtadorurl.repositories.LinkRepository;
 import com.encurtador.encurtadorurl.util.LinkUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,7 @@ public class LinkController {
 
         Map<String, String> requestBody;
         try {
-            requestBody = new ObjectMapper().readValue(link, HashMap.class);
+            requestBody = new ObjectMapper().readValue(link, new TypeReference<HashMap<String, String>>(){});
         } catch (JsonProcessingException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
