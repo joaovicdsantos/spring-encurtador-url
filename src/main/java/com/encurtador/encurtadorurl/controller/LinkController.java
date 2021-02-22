@@ -69,7 +69,7 @@ public class LinkController {
         return ResponseEntity.ok(repository.findById(id).get());
     }
 
-    @GetMapping("/atributo")
+    @GetMapping("/filtro")
     @ResponseStatus(code = HttpStatus.OK)
     public ResponseEntity<Link> consultarLinkPelosLinks(@RequestParam("link") String link) {
         if (!repository.existsByLink(link) && !repository.existsByLinkEncurtado(link))

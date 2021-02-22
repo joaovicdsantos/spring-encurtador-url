@@ -26,6 +26,6 @@ Os links já cadastrados podem ser obtidos através de seus respectivos __IDs__,
 ##### Via ID
 - `/api/v1/links/{id}` `GET`
 ##### Via Links
-- `/api/v1/links/atributo?link={link_desejado}` `GET`
+- `/api/v1/links/filtro?link={link_desejado}` `GET`
 #### Remoção
 - `/api/v1/links/{id}` `DELETE`
