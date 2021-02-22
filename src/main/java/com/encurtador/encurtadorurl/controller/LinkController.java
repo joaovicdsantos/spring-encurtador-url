@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.encurtador.encurtadorurl.model.Link;
-import com.encurtador.encurtadorurl.repositories.LinkRespository;
+import com.encurtador.encurtadorurl.repositories.LinkRepository;
 import com.encurtador.encurtadorurl.util.LinkUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class LinkController {
 
     @Autowired
-    private LinkRespository repository;
+    private LinkRepository repository;
 
     @RequestMapping
     @ResponseStatus(code = HttpStatus.OK)
